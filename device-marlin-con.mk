@@ -1,5 +1,6 @@
 #
 # Copyright (C) 2016 The Android Open-Source Project
+# Copyright (C) 2015-2017 The Android Container Open Source Project
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -22,40 +23,6 @@ PRODUCT_AAPT_CONFIG := normal
 PRODUCT_AAPT_PREF_CONFIG := 560dpi
 PRODUCT_AAPT_PREBUILT_DPI := xxxhdpi xxhdpi xhdpi hdpi
 
-## Kernel build from source
-PRODUCT_OUT := out/target/product/marlin
-TARGET_OUT_INTERMEDIATES := ${PRODUCT_OUT}/obj
-KERNEL_DEFCONFIG := marlincon_defconfig
-KERNEL_SRC_DIR := kernel
-KERNEL_CFG_NAME := marlin
-TARGET_KERNEL_ARCH := arm64
-TARGET_KERNEL_CROSS_COMPILE_PREFIX := aarch64-linux-android- 
-TARGET_KERNEL_APPEND_DTB := true
-
--include kernel/AndroidKernel.mk
-
-# Check for availability of kernel source
-ifneq ($(wildcard $(KERNEL_SRC_DIR)/Makefile),)
-  # Give precedence to TARGET_PREBUILT_KERNEL
-  ifeq ($(TARGET_PREBUILT_KERNEL),)
-    TARGET_KERNEL_BUILT_FROM_SOURCE := true
-  endif
-endif
-
-ifneq ($(TARGET_KERNEL_BUILT_FROM_SOURCE), true)
-# Use prebuilt kernel
-ifeq ($(TARGET_PREBUILT_KERNEL),)
-LOCAL_KERNEL := device/google/marlin-kernel/Image.gz-dtb
-else
-LOCAL_KERNEL := $(TARGET_PREBUILT_KERNEL)
-endif
-
-PRODUCT_COPY_FILES += \
-    $(LOCAL_KERNEL):kernel
-
-endif #TARGET_KERNEL_BUILT_FROM_SOURCE
-
-
 -include device/google/marlin/device-common.mk
 
 # Overlay
@@ -75,12 +42,30 @@ PRODUCT_PROPERTY_OVERRIDES += \
     ro.hwui.layer_cache_size=48 \
     ro.hwui.path_cache_size=32
 
+# Container specific properties
+PRODUCT_PROPERTY_OVERRIDES += \
+    service.adb.tcp.port=5555 \
+    ro.boot.container.id=1 \
+    debug.sf.nobootanimation=1
+
+# fstab.marlin has been identified in aosp_marlin_con.mk
 PRODUCT_COPY_FILES += \
-    vendor/icl/marlin/proprietary/config/init.marlin.host.rc:root/init.marlin.rc:icl \
+    vendor/icl/marlin/proprietary/config/init.marlin.con.rc:root/init.marlin.rc:icl  \
     device/google/marlin/init.common.usb.rc:root/init.marlin.usb.rc \
-    device/google/marlin/fstab.common:root/fstab.marlin \
-    device/google/marlin/ueventd.common.rc:root/ueventd.marlin.rc \
+    vendor/icl/marlin/proprietary/config/ueventd.marlin.con.rc:root/ueventd.marlin.rc:icl \
     device/google/marlin/init.recovery.common.rc:root/init.recovery.marlin.rc
+
+# Container init.rc, overide init.rc copied from system/core/rootdir/init.rc
+PRODUCT_COPY_FILES += \
+    vendor/icl/marlin/proprietary/config/init.con.rc:root/init.rc:icl
+
+# Container overide origina rc in system/etc/init
+PRODUCT_COPY_FILES += \
+    vendor/icl/marlin/proprietary/config/system/etc/init/keystore.rc:system/etc/init/keystore.rc:icl \
+    vendor/icl/marlin/proprietary/config/system/etc/init/servicemanager.rc:system/etc/init/servicemanager.rc:icl \
+    vendor/icl/marlin/proprietary/config/system/etc/init/surfaceflinger.rc:system/etc/init/surfaceflinger.rc:icl \
+    vendor/icl/marlin/proprietary/config/system/etc/init/update_engine.rc:system/etc/init/update_engine.rc:icl \
+    vendor/icl/marlin/proprietary/config/system/etc/init/audioserver.rc:system/etc/init/audioserver.rc:icl
 
 # Sensor hub init script
 PRODUCT_COPY_FILES += \
@@ -109,3 +94,4 @@ PRODUCT_PACKAGES += \
 # VR packages
 PRODUCT_PACKAGES += \
     vr.marlin
+

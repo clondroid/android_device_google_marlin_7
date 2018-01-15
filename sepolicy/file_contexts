@@ -188,3 +188,14 @@
 /persist(/.*)?          u:object_r:persist_file:s0
 /persist/data(/.*)?     u:object_r:persist_data_file:s0
 /persist/display(/.*)?  u:object_r:persist_display_file:s0
+
+# conbinder
+/dev/conbinder1         u:object_r:binder_device:s0
+/dev/conbinder2         u:object_r:binder_device:s0
+/dev/conbinder3         u:object_r:binder_device:s0
+/dev/conbinder4         u:object_r:binder_device:s0
+/dev/conbinder5         u:object_r:binder_device:s0
+/dev/conbinder6         u:object_r:binder_device:s0
+/dev/conbinder7         u:object_r:binder_device:s0
+/dev/conbinder8         u:object_r:binder_device:s0
+/dev/conbinder9         u:object_r:binder_device:s0

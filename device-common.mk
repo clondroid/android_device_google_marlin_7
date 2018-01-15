@@ -366,10 +366,12 @@ AB_OTA_PARTITIONS += \
     boot \
     system
 
-# NFC packages
-PRODUCT_PACKAGES += \
-    NfcNci \
-    Tag
+ifeq ($(TARGET_PRODUCT),aosp_marlin_con)
+else
+    # NFC packages
+    PRODUCT_PACKAGES += \
+        NfcNci
+endif
 
 # NFC/camera interaction workaround - DO NOT COPY TO NEW DEVICES
 PRODUCT_PROPERTY_OVERRIDES += \

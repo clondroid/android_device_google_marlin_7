@@ -631,11 +631,8 @@ FSTMAN += fstman.ini
 
 PRODUCT_PACKAGES := \
     AccountAndSyncSettings \
-    DeskClock \
     AlarmProvider \
     Bluetooth \
-    Calculator \
-    Calendar \
     Camera \
     CellBroadcastReceiver \
     CertInstaller \
@@ -646,7 +643,6 @@ PRODUCT_PACKAGES := \
     Mms \
     Music \
     Phone \
-    Provision \
     QuickSearchBox \
     Settings \
     Sync \
@@ -783,12 +779,8 @@ PRODUCT_PACKAGES_DEBUG := init.qcom.testscripts.sh
 
 #NANOPB_LIBRARY_NAME := libnanopb-c-2.8.0
 PRODUCT_COPY_FILES := \
-    frameworks/native/data/etc/android.hardware.telephony.gsm.xml:system/etc/permissions/android.hardware.telephony.gsm.xml \
-    frameworks/native/data/etc/android.hardware.telephony.cdma.xml:system/etc/permissions/android.hardware.telephony.cdma.xml \
     frameworks/native/data/etc/android.hardware.location.gps.xml:system/etc/permissions/android.hardware.location.gps.xml \
     frameworks/native/data/etc/android.hardware.touchscreen.multitouch.jazzhand.xml:system/etc/permissions/android.hardware.touchscreen.multitouch.jazzhand.xml \
-    frameworks/native/data/etc/android.hardware.wifi.xml:system/etc/permissions/android.hardware.wifi.xml \
-    frameworks/native/data/etc/android.hardware.wifi.direct.xml:system/etc/permissions/android.hardware.wifi.direct.xml \
     frameworks/native/data/etc/android.software.sip.voip.xml:system/etc/permissions/android.software.sip.voip.xml \
     frameworks/native/data/etc/handheld_core_hardware.xml:system/etc/permissions/handheld_core_hardware.xml \
     frameworks/native/data/etc/android.hardware.sensor.proximity.xml:system/etc/permissions/android.hardware.sensor.proximity.xml \
@@ -801,6 +793,16 @@ PRODUCT_COPY_FILES := \
     frameworks/native/data/etc/android.hardware.nfc.xml:system/etc/permissions/android.hardware.nfc.xml \
     frameworks/native/data/etc/android.hardware.nfc.hce.xml:system/etc/permissions/android.hardware.nfc.hce.xml \
     frameworks/native/data/etc/com.nxp.mifare.xml:system/etc/permissions/com.nxp.mifare.xml
+
+ifeq ($(TARGET_PRODUCT),aosp_marlin_con)
+    # NOT include wifi features here
+else
+    PRODUCT_COPY_FILES += \
+	frameworks/native/data/etc/android.hardware.telephony.gsm.xml:system/etc/permissions/android.hardware.telephony.gsm.xml \
+	frameworks/native/data/etc/android.hardware.telephony.cdma.xml:system/etc/permissions/android.hardware.telephony.cdma.xml \
+        frameworks/native/data/etc/android.hardware.wifi.xml:system/etc/permissions/android.hardware.wifi.xml \
+	frameworks/native/data/etc/android.hardware.wifi.direct.xml:system/etc/permissions/android.hardware.wifi.direct.xml
+endif
 
 # Bluetooth configuration files
 #PRODUCT_COPY_FILES += \
@@ -842,7 +844,12 @@ $(call inherit-product, build/target/product/verity.mk)
 #skip boot jars check
 SKIP_BOOT_JARS_CHECK := true
 
-#TODO: always adb.secure ifeq ($(TARGET_BUILD_VARIANT),user)
-PRODUCT_DEFAULT_PROPERTY_OVERRIDES+= \
-    ro.adb.secure=1
+ifeq ($(TARGET_PRODUCT),aosp_marlin_con)
+    PRODUCT_DEFAULT_PROPERTY_OVERRIDES+= \
+        ro.adb.secure=0
+else
+    #TODO: always adb.secure ifeq ($(TARGET_BUILD_VARIANT),user)
+    PRODUCT_DEFAULT_PROPERTY_OVERRIDES+= \
+        ro.adb.secure=1
 #endif
+endif
